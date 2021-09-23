@@ -46,6 +46,7 @@ class LoginForm extends React.Component {
 
     const errors = this.validate();
     this.setState({ errors: errors || {} });
+    if (errors) return;
   };
 
   validateProperty = ({ name, value }) => {
@@ -72,6 +73,7 @@ class LoginForm extends React.Component {
 
     const account = { ...this.state.account };
     account[input.name] = input.value;
+
     this.setState({ account, errors });
   };
 
