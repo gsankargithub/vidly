@@ -1,5 +1,6 @@
 import React from "react";
 import Input from "./common/input";
+import Joi from "joi-browser";
 class LoginForm extends React.Component {
   state = {
     account: { username: "", password: "" },
@@ -13,16 +14,31 @@ class LoginForm extends React.Component {
   //     this.username.current.focus();
   //   }
 
+  schema = {
+    username: Joi.string().required().label("Username"),
+    password: Joi.string().required().label("Password"),
+  };
+
   validate = () => {
+    const result = Joi.validate(this.state.account, this.schema, {
+      abortEarly: false,
+    });
+
+    if (!result.error) return null;
+
     const errors = {};
+    for (let item of result.error.details) errors[item.path[0]] = item.message;
+    return errors;
+    // console.log(result);
+    // const errors = {};
 
-    const { account } = this.state;
-    if (account.username.trim() === "")
-      errors.username = "Username is Required.";
-    if (account.password.trim() === "")
-      errors.password = "Password is Required.";
+    // const { account } = this.state;
+    // if (account.username.trim() === "")
+    //   errors.username = "Username is Required.";
+    // if (account.password.trim() === "")
+    //   errors.password = "Password is Required.";
 
-    return Object.keys(errors).length === 0 ? null : errors;
+    // return Object.keys(errors).length === 0 ? null : errors;
   };
 
   handleSubmit = (e) => {
@@ -32,14 +48,20 @@ class LoginForm extends React.Component {
     this.setState({ errors: errors || {} });
   };
 
-  validateProperty = (input) => {
-    if (input.name === "username") {
-      if (input.value.trim() === "") return "Username is Required.";
-    }
-    if (input.name === "password") {
-      if (input.value.trim() === "") return "Password is Required.";
-    }
+  validateProperty = ({ name, value }) => {
+    const obj = { [name]: value };
+    const schema = { [name]: this.schema[name] };
+    const { error } = Joi.validate(obj, schema);
+    return error ? error.details[0].message : null;
   };
+  // validateProperty = (input) => {
+  //   if (input.name === "username") {
+  //     if (input.value.trim() === "") return "Username is Required.";
+  //   }
+  //   if (input.name === "password") {
+  //     if (input.value.trim() === "") return "Password is Required.";
+  //   }
+  // };
 
   handleChange = ({ currentTarget: input }) => {
     const errors = { ...this.state.errors };
@@ -74,7 +96,9 @@ class LoginForm extends React.Component {
             error={errors.password}
           />
 
-          <button className="btn btn-primary">Login</button>
+          <button disabled={this.validate()} className="btn btn-primary">
+            Login
+          </button>
         </form>
       </div>
     );
