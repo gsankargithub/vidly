@@ -2,10 +2,11 @@ import React, { Component } from "react";
 import Joi from "joi-browser";
 import Input from "./input";
 import Select from "./select";
+
 class Form extends Component {
   state = {
     data: {},
-    errors: {},
+    errors: {}
   };
 
   validate = () => {
@@ -25,7 +26,7 @@ class Form extends Component {
     return error ? error.details[0].message : null;
   };
 
-  handleSubmit = (e) => {
+  handleSubmit = e => {
     e.preventDefault();
 
     const errors = this.validate();
